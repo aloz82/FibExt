@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fibonacci Kesişim Analizi</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2980b9;
+            --accent-color: #e74c3c;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --purple-color: #9b59b6;
+            --dark-color: #2c3e50;
+            --light-color: #ecf0f1;
+            --border-radius: 12px;
+            --box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 40px 0;
+            color: white;
+            text-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
+            margin-bottom: 20px;
+        }
+        
+        header h1 {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            animation: fadeIn 1s ease;
+        }
+        
+        header p {
+            font-size: 1.3rem;
+            max-width: 800px;
+            margin: 0 auto;
+            opacity: 0.9;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.97);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 35px;
+            margin-bottom: 30px;
+            transition: var(--transition);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+        
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25);
+        }
+        
+        .card-title {
+            color: var(--dark-color);
+            border-bottom: 3px solid var(--primary-color);
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+            font-size: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .card-title i {
+            color: var(--primary-color);
+        }
+        
+        .input-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .input-container {
+            flex: 1;
+            min-width: 250px;
+        }
+        
+        .input-container h3 {
+            color: var(--dark-color);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.4rem;
+        }
+        
+        .input-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+        
+        .input-wrapper i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.3rem;
+            z-index: 2;
+        }
+        
+        .input-wrapper.range-a i {
+            color: var(--primary-color);
+        }
+        
+        .input-wrapper.range-b i {
+            color: var(--purple-color);
+        }
+        
+        .input-container label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--dark-color);
+            font-size: 1.05rem;
+        }
+        
+        .input-container input {
+            width: 100%;
+            padding: 16px 16px 16px 50px;
+            border: 2px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1.15rem;
+            transition: var(--transition);
+            background: #f9f9f9;
+            position: relative;
+        }
+        
+        .input-container input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.3);
+            background: white;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            padding: 16px 40px;
+            font-size: 1.3rem;
+            font-weight: 600;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            box-shadow: 0 6px 15px rgba(52, 152, 219, 0.35);
+        }
+        
+        .btn:hover {
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(52, 152, 219, 0.5);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-container {
+            text-align: center;
+            margin: 35px 0;
+        }
+        
+        .results-container {
+            margin-top: 40px;
+            animation: fadeIn 0.8s ease;
+        }
+        
+        .result-card {
+            background: linear-gradient(135deg, var(--success-color), #27ae60);
+            color: white;
+            border-radius: var(--border-radius);
+            padding: 35px;
+            text-align: center;
+            margin-top: 25px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .result-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.4);
+        }
+        
+        .result-value {
+            font-size: 3rem;
+            font-weight: 800;
+            margin: 20px 0;
+            text-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+        }
+        
+        .result-desc {
+            font-size: 1.3rem;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+        
+        .chart-container {
+            height: 450px;
+            margin-top: 40px;
+            background: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+        }
+        
+        .info-section {
+            background: var(--light-color);
+            border-radius: var(--border-radius);
+            padding: 30px;
+        }
+        
+        .info-section h2 {
+            color: var(--dark-color);
+            margin-bottom: 25px;
+            font-size: 2rem;
+        }
+        
+        .info-section p {
+            line-height: 1.8;
+            margin-bottom: 25px;
+            font-size: 1.15rem;
+        }
+        
+        .formula-section {
+            background: linear-gradient(135deg, #f9f9f9, #eef2f7);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            margin: 30px 0;
+            text-align: center;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--dark-color);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border: 2px dashed var(--primary-color);
+        }
+        
+        .formula-section .formula {
+            color: var(--accent-color);
+            font-size: 1.8rem;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            background: rgba(231, 76, 60, 0.1);
+            padding: 15px;
+            border-radius: var(--border-radius);
+            display: inline-block;
+        }
+        
+        .explanation {
+            display: flex;
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        .explanation-card {
+            flex: 1;
+            padding: 25px;
+            border-radius: var(--border-radius);
+            background: white;
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+        }
+        
+        .explanation-card:hover {
+            transform: translateY(-7px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.18);
+        }
+        
+        .explanation-card h3 {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            color: var(--dark-color);
+            font-size: 1.5rem;
+            gap: 12px;
+        }
+        
+        .explanation-card ul {
+            padding-left: 30px;
+        }
+        
+        .explanation-card li {
+            margin-bottom: 15px;
+            line-height: 1.7;
+            font-size: 1.1rem;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            color: white;
+            margin-top: 30px;
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .alert {
+            padding: 18px;
+            border-radius: var(--border-radius);
+            margin-bottom: 25px;
+            display: none;
+            animation: fadeIn 0.5s ease;
+            background: var(--warning-color);
+            color: white;
+            font-weight: 500;
+            text-align: center;
+            font-size: 1.15rem;
+        }
+        
+        .alert.show {
+            display: block;
+        }
+        
+        .chart-legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+        }
+        
+        .legend-color {
+            width: 25px;
+            height: 5px;
+            border-radius: 3px;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @media (max-width: 768px) {
+            .input-group {
+                flex-direction: column;
+            }
+            
+            .explanation {
+                flex-direction: column;
+            }
+            
+            header h1 {
+                font-size: 2.4rem;
+            }
+            
+            .result-value {
+                font-size: 2.2rem;
+            }
+            
+            .input-row {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-project-diagram"></i> Fibonacci Kesişim Analizi</h1>
+            <p>İki farklı fiyat aralığının Fibonacci seviyelerinde nasıl kesiştiğini görselleştirin</p>
+        </header>
+        
+        <main>
+            <div class="card">
+                <h2 class="card-title"><i class="fas fa-sliders-h"></i> Fiyat Aralıklarını Ayarlayın</h2>
+                
+                <div class="alert" id="errorAlert">
+                    <i class="fas fa-exclamation-triangle"></i> Lütfen geçerli sayısal değerler girin! (Ör: 100.50 veya 100,50)
+                </div>
+                
+                <div class="input-group">
+                    <div class="input-container">
+                        <h3><i class="fas fa-chart-line" style="color: var(--primary-color);"></i> İlk Fiyat Aralığı (A-B)</h3>
+                        <div class="input-row">
+                            <div class="input-wrapper range-a">
+                                <i class="fas fa-arrow-up"></i>
+                                <input type="text" id="pointA" placeholder="A Noktası" value="100">
+                            </div>
+                            <div class="input-wrapper range-a">
+                                <i class="fas fa-arrow-down"></i>
+                                <input type="text" id="pointB" placeholder="B Noktası" value="200">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="input-container">
+                        <h3><i class="fas fa-chart-line" style="color: var(--purple-color);"></i> İkinci Fiyat Aralığı (C-D)</h3>
+                        <div class="input-row">
+                            <div class="input-wrapper range-b">
+                                <i class="fas fa-arrow-up"></i>
+                                <input type="text" id="pointC" placeholder="C Noktası" value="150">
+                            </div>
+                            <div class="input-wrapper range-b">
+                                <i class="fas fa-arrow-down"></i>
+                                <input type="text" id="pointD" placeholder="D Noktası" value="180">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="formula-section">
+                    <div>Kesişim Yüzdesi Formülü:</div>
+                    <div class="formula">p = (C - A) / ((B - A) - (D - C))</div>
+                    <div>Kesişim Fiyatı: Fiyat = A + p × (B - A)</div>
+                </div>
+                
+                <div class="btn-container">
+                    <button id="calculateBtn" class="btn">
+                        <i class="fas fa-calculator"></i> Kesişimi Analiz Et
+                    </button>
+                </div>
+                
+                <div class="results-container" id="resultsContainer">
+                    <!-- Results will be populated here -->
+                </div>
+                
+                <div class="chart-container">
+                    <canvas id="fibChart"></canvas>
+                </div>
+                
+                <div class="chart-legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: var(--primary-color);"></div>
+                        <span>A-B Aralığı</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: var(--purple-color);"></div>
+                        <span>C-D Aralığı</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: var(--accent-color);"></div>
+                        <span>Kesişim Noktası</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card info-section">
+                <h2><i class="fas fa-lightbulb"></i> Genişletilmiş Fibonacci Kesişim Analizi</h2>
+                <p>Bu geliştirilmiş analiz aracı, iki farklı fiyat aralığının Fibonacci seviyelerinde nasıl kesiştiğini genişletilmiş bir yüzde aralığında (-%50'den %150'ye) gösterir. Bu sayede:</p>
+                
+                <div class="explanation">
+                    <div class="explanation-card">
+                        <h3><i class="fas fa-chart-line"></i> Geliştirmeler</h3>
+                        <ul>
+                            <li>Fibonacci seviyeleri genişletilmiş aralıkta hesaplanır</li>
+                            <li>Kesişim noktası net bir şekilde işaretlenir</li>
+                            <li>İki eğri arasındaki ilişki daha net görülür</li>
+                            <li>%100'ün ötesindeki seviyeler de dahil edilir</li>
+                            <li>Kesişimin önemi renk kodlu sonuçlarla vurgulanır</li>
+                        </ul>
+                    </div>
+                    <div class="explanation-card">
+                        <h3><i class="fas fa-bullseye"></i> Analiz Teknikleri</h3>
+                        <ul>
+                            <li>Trend uyumluluk analizi</li>
+                            <li>Destek/direnç konsolidasyonu</li>
+                            <li>Fiyat hedefi belirleme</li>
+                            <li>Piyasa dönüş sinyalleri</li>
+                            <li>Zaman-performans korelasyonu</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <footer>
+            <p>Fibonacci Kesişim Analizi &copy; 2023 | Profesyonel teknik analiz için geliştirilmiş araç</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const pointAInput = document.getElementById('pointA');
+            const pointBInput = document.getElementById('pointB');
+            const pointCInput = document.getElementById('pointC');
+            const pointDInput = document.getElementById('pointD');
+            const calculateBtn = document.getElementById('calculateBtn');
+            const resultsContainer = document.getElementById('resultsContainer');
+            const errorAlert = document.getElementById('errorAlert');
+            let fibChart = null;
+            
+            // Function to parse input values with comma and dot support
+            function parseInputValue(value) {
+                const normalizedValue = value.replace(',', '.');
+                return parseFloat(normalizedValue);
+            }
+            
+            // Function to calculate extended Fibonacci levels
+            function calculateExtendedFibonacciLevels(start, end) {
+                const diff = end - start;
+                const extendedLevels = [
+                    -0.5, -0.382, -0.236, 0, 
+                    0.236, 0.382, 0.5, 0.618, 0.786, 1, 
+                    1.236, 1.382, 1.5, 1.618, 2.0
+                ];
+                
+                const levels = {};
+                extendedLevels.forEach(level => {
+                    levels[`${(level * 100).toFixed(1)}%`] = start + level * diff;
+                });
+                
+                return levels;
+            }
+            
+            // Function to calculate intersection percentage
+            function calculateIntersection(A, B, C, D) {
+                // Calculate the intersection percentage
+                const numerator = C - A;
+                const denominator = (B - A) - (D - C);
+                
+                // Check for division by zero
+                if (Math.abs(denominator) < 0.0001) {
+                    return null; // Lines are parallel
+                }
+                
+                const p = numerator / denominator;
+                
+                // Calculate the intersection price
+                const intersectionPrice = A + p * (B - A);
+                
+                return {
+                    percentage: p * 100,
+                    price: intersectionPrice
+                };
+            }
+            
+            // Function to render results
+            function renderResults(intersection, A, B, C, D) {
+                if (!intersection) {
+                    resultsContainer.innerHTML = `
+                        <div class="result-card" style="background: linear-gradient(135deg, ${'var(--accent-color)'}, #c0392b);">
+                            <h3><i class="fas fa-exclamation-circle"></i> Kesişim Bulunamadı</h3>
+                            <div class="result-desc">
+                                Girilen aralıklar paralel olduğu için kesişim noktası bulunamadı. 
+                                Lütfen farklı değerler deneyin.
+                            </div>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                const percentage = intersection.percentage;
+                const price = intersection.price;
+                
+                // Determine the significance
+                let significance = "";
+                let color = "var(--warning-color)";
+                
+                if (Math.abs(percentage - 38.2) < 5 || Math.abs(percentage - 61.8) < 5) {
+                    significance = "Yüksek Önem (Ana Fibonacci Seviyesi)";
+                    color = "var(--success-color)";
+                } else if (Math.abs(percentage - 50) < 5 || Math.abs(percentage - 100) < 5) {
+                    significance = "Orta Önem (Psikolojik Seviye)";
+                    color = "var(--primary-color)";
+                } else if (Math.abs(percentage - 0) < 5 || Math.abs(percentage - 23.6) < 5 || Math.abs(percentage - 78.6) < 5) {
+                    significance = "Düşük Önem (İkincil Seviye)";
+                    color = "var(--warning-color)";
+                } else {
+                    significance = "Özel Seviye (Genişletilmiş Aralık)";
+                    color = "var(--purple-color)";
+                }
+                
+                resultsContainer.innerHTML = `
+                    <div class="result-card" style="background: linear-gradient(135deg, ${color}, #27ae60);">
+                        <h3><i class="fas fa-bullseye"></i> Kesişim Noktası Bulundu</h3>
+                        <div class="result-value">${percentage.toFixed(2)}%</div>
+                        <div class="result-desc">
+                            Kesişim fiyatı: <strong>${price.toFixed(4)}</strong><br>
+                            Önem seviyesi: <strong>${significance}</strong><br>
+                            Bu seviye, fiyat hareketleri için potansiyel bir destek/direnç noktasıdır.
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Function to render chart
+            function renderChart(A, B, C, D, intersection) {
+                const ctx = document.getElementById('fibChart').getContext('2d');
+                
+                if (fibChart) {
+                    fibChart.destroy();
+                }
+                
+                // Calculate extended Fibonacci levels for both ranges
+                const fibLevels1 = calculateExtendedFibonacciLevels(A, B);
+                const fibLevels2 = calculateExtendedFibonacciLevels(C, D);
+                
+                // Prepare data for chart
+                const labels = Object.keys(fibLevels1);
+                const values1 = Object.values(fibLevels1);
+                const values2 = Object.values(fibLevels2);
+                
+                // Create datasets
+                const datasets = [
+                    {
+                        label: 'A-B Aralığı',
+                        data: values1,
+                        borderColor: 'rgba(52, 152, 219, 1)',
+                        backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                        borderWidth: 4,
+                        pointBackgroundColor: 'rgba(52, 152, 219, 1)',
+                        pointRadius: 0,
+                        tension: 0,
+                        fill: false
+                    },
+                    {
+                        label: 'C-D Aralığı',
+                        data: values2,
+                        borderColor: 'rgba(155, 89, 182, 1)',
+                        backgroundColor: 'rgba(155, 89, 182, 0.1)',
+                        borderWidth: 4,
+                        pointBackgroundColor: 'rgba(155, 89, 182, 1)',
+                        pointRadius: 0,
+                        tension: 0,
+                        fill: false
+                    }
+                ];
+                
+                // Add intersection point if exists
+                if (intersection) {
+                    // Find the index closest to the intersection percentage
+                    const percentage = intersection.percentage;
+                    const percentageValues = labels.map(label => parseFloat(label));
+                    
+                    // Find the closest index
+                    let closestIndex = 0;
+                    let minDiff = Infinity;
+                    
+                    for (let i = 0; i < percentageValues.length; i++) {
+                        const diff = Math.abs(percentageValues[i] - percentage);
+                        if (diff < minDiff) {
+                            minDiff = diff;
+                            closestIndex = i;
+                        }
+                    }
+                    
+                    datasets.push({
+                        label: 'Kesişim Noktası',
+                        data: labels.map((_, index) => index === closestIndex ? intersection.price : null),
+                        borderColor: 'transparent',
+                        backgroundColor: 'transparent',
+                        pointBackgroundColor: 'rgba(231, 76, 60, 1)',
+                        pointRadius: 8,
+                        pointHoverRadius: 12,
+                        pointStyle: 'circle',
+                        datalabels: {
+                            display: false
+                        }
+                    });
+                }
+                
+                fibChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: datasets
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Genişletilmiş Fibonacci Seviyeleri ve Kesişim Noktası',
+                                font: {
+                                    size: 20,
+                                    weight: 'bold'
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        if (context.datasetIndex === 2) {
+                                            return `Kesişim: ${intersection.price.toFixed(4)} (${intersection.percentage.toFixed(2)}%)`;
+                                        }
+                                        return `${context.dataset.label}: ${context.parsed.y.toFixed(4)}`;
+                                    }
+                                }
+                            },
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: false,
+                                title: {
+                                    display: true,
+                                    text: 'Fiyat Seviyeleri',
+                                    font: {
+                                        size: 15,
+                                        weight: 'bold'
+                                    }
+                                },
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.05)'
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Fibonacci Seviyeleri',
+                                    font: {
+                                        size: 15,
+                                        weight: 'bold'
+                                    }
+                                },
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.05)'
+                                }
+                            }
+                        },
+                        elements: {
+                            line: {
+                                tension: 0.3
+                            }
+                        },
+                        interaction: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    }
+                });
+            }
+            
+            // Initial calculation and rendering
+            function calculateAndRender() {
+                const A = parseInputValue(pointAInput.value);
+                const B = parseInputValue(pointBInput.value);
+                const C = parseInputValue(pointCInput.value);
+                const D = parseInputValue(pointDInput.value);
+                
+                // Input validation
+                if (isNaN(A) || isNaN(B) || isNaN(C) || isNaN(D)) {
+                    errorAlert.classList.add('show');
+                    return;
+                }
+                
+                errorAlert.classList.remove('show');
+                
+                // Calculate intersection
+                const intersection = calculateIntersection(A, B, C, D);
+                
+                // Render results
+                renderResults(intersection, A, B, C, D);
+                
+                // Render chart
+                renderChart(A, B, C, D, intersection);
+            }
+            
+            // Event listeners
+            calculateBtn.addEventListener('click', calculateAndRender);
+            
+            // Also calculate when pressing Enter in input fields
+            [pointAInput, pointBInput, pointCInput, pointDInput].forEach(input => {
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        calculateAndRender();
+                    }
+                });
+            });
+            
+            // Initial render with default values
+            calculateAndRender();
+        });
+    </script>
+</body>
+</html>
